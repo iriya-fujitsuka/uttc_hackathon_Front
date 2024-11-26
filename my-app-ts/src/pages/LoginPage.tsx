@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Link をインポート
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -8,7 +8,7 @@ const LoginPage = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // ログイン処理（例: フェイク認証）
+    // ログイン処理
     if (email && password) {
       navigate("/home"); // ホームページに遷移
     } else {
@@ -20,7 +20,7 @@ const LoginPage = () => {
     <div style={{ display: "flex", height: "100vh" }}>
       {/* 左側ロゴ */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-        <h1 style={{ fontWeight: "bold" }}>HEART BRIDGE</h1>
+      <img src="/images/logo light.jpg" alt="Heart Bridge Logo" style={{ maxWidth: "400px", marginBottom: "20px" }} />
       </div>
 
       {/* 右側フォーム */}
@@ -55,6 +55,9 @@ const LoginPage = () => {
           >
             Sign In
           </button>
+          <p style={{ textAlign: "center", marginTop: "10px" }}>
+            <a href="/register" style={{ textDecoration: "none", color: "black" }}>初めての方はこちら →</a>
+          </p>
         </form>
       </div>
     </div>

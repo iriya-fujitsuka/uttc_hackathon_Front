@@ -14,8 +14,7 @@ const RegisterPage = () => {
     <div style={{ display: "flex", height: "100vh" }}>
       {/* 左側ロゴ */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-        <img src="path/to/logo.png" alt="Heart Bridge Logo" style={{ maxWidth: "150px", marginBottom: "20px" }} />
-        <h1 style={{ fontWeight: "bold" }}>HEART BRIDGE</h1>
+        <img src="/images/logo light.jpg" alt="Heart Bridge Logo" style={{ maxWidth: "400px", marginBottom: "20px" }} />
       </div>
 
       {/* 右側フォーム */}
@@ -51,7 +50,7 @@ const RegisterPage = () => {
             Register
           </button>
           <p style={{ textAlign: "center", marginTop: "10px" }}>
-            <a href="/login" style={{ textDecoration: "none", color: "black" }}>Sign In →</a>
+            <a href="/" style={{ textDecoration: "none", color: "black" }}>アカウントを持っている方はこちら →</a>
           </p>
         </form>
       </div>
