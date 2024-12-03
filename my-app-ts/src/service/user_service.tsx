@@ -4,6 +4,9 @@ import { Userrequest } from "../types/user";
 export async function registerUser(user: Userrequest) {
   const url = process.env.REACT_APP_BASE_URL + "/users";
 
+   // ログで確認
+  console.log("Sending user data:", user);
+  
   try {
     const response = await fetch(url, {
       method: "POST",
