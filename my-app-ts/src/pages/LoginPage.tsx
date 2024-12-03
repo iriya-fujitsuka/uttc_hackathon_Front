@@ -14,8 +14,12 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(fireAuth, email, password);
-      console.log("User logged in:", userCredential.user);
-      navigate("/home"); // 即時リダイレクト
+      const user = userCredential.user;
+      console.log("User logged in:", user);
+
+      // ログイン成功後、ユーザー情報を保存してホームページへリダイレクト
+      localStorage.setItem("userId", user.uid); // 必要ならUIDを保存
+      navigate("/home"); // リダイレクト
     } catch (err: any) {
       console.error("Error during login:", err.message);
       setError("メールアドレスまたはパスワードが正しくありません。");
@@ -32,7 +36,7 @@ const LoginPage = () => {
       {/* 右側フォーム */}
       <div className="form-container">
         <form onSubmit={handleLogin} className="login-form">
-          <h2 className="form-title">ようこそ！ログインしてください</h2>
+          <h2 style={{ textAlign: "center", marginBottom: "20px" }}>病気を知る・つながる</h2>
           {error && <p className="error-message">{error}</p>}
           <div className="input-group">
             <label htmlFor="email">メールアドレス</label>

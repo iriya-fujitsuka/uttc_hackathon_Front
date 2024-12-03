@@ -1,20 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { fireAuth } from "../firebase";
+import { useNavigate } from "react-router-dom";
 import CommunityList from "../components/CommunityList";
 import PostForm from "../components/PostForm";
 import PostList from "../components/PostList";
-import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const [user, setUser] = useState<any>(null); // ログイン中のユーザー情報を管理
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    navigate("/"); // ログインページにリダイレクト
+  useEffect(() => {
+    // 認証状態を監視
+    const unsubscribe = onAuthStateChanged(fireAuth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser); // 認証済み
+      } else {
+        navigate("/login"); // 未認証ならログインページへリダイレクト
+      }
+    });
+
+    // クリーンアップ
+    return () => unsubscribe();
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(fireAuth); // Firebaseの認証状態を解除
+      navigate("/login"); // ログインページへリダイレクト
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       {/* 上部: ヘッダー */}
-      <div style={{ padding: "10px 20px", backgroundColor: "#f7f7f7", display: "flex", justifyContent: "flex-end" }}>
+      <div
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#f7f7f7",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1>ようこそ、{user?.email} さん！</h1>
         <button
           onClick={handleLogout}
           style={{
