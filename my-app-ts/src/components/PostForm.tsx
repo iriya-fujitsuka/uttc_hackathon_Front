@@ -3,9 +3,42 @@ import React, { useState } from "react";
 const PostForm = () => {
   const [postContent, setPostContent] = useState("");
 
-  const handleSubmit = () => {
-    console.log("投稿内容:", postContent);
-    setPostContent(""); // 投稿後にリセット
+  const handleSubmit = async () => {
+    if (!postContent.trim()) {
+      alert("投稿内容を入力してください！");
+      return;
+    }
+
+    // ローカルストレージからユーザーIDを取得
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("ログインしていません。ログイン後に投稿してください。");
+      return;
+    }
+
+    const post = {
+      user_id: userId, // ログイン中のユーザーID
+      content: postContent,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(post),
+      });
+
+      if (response.ok) {
+        console.log("投稿が成功しました！");
+        setPostContent(""); // 投稿後にリセット
+      } else {
+        console.error("投稿に失敗しました。");
+      }
+    } catch (error) {
+      console.error("エラーが発生しました:", error);
+    }
   };
 
   return (
