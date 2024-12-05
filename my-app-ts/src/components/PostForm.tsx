@@ -4,6 +4,7 @@ const PostForm = () => {
   const [postContent, setPostContent] = useState("");
 
   const handleSubmit = async () => {
+    // 投稿内容が空でないことを確認
     if (!postContent.trim()) {
       alert("投稿内容を入力してください！");
       return;
@@ -16,13 +17,15 @@ const PostForm = () => {
       return;
     }
 
+    // 投稿データを準備
     const post = {
       user_id: userId, // ログイン中のユーザーID
-      content: postContent,
+      content: postContent, // 投稿内容
     };
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/posts`, {
+      // fetch を使用してバックエンドにPOSTリクエストを送信
+      const response = await fetch("/api/posts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,12 +35,15 @@ const PostForm = () => {
 
       if (response.ok) {
         console.log("投稿が成功しました！");
-        setPostContent(""); // 投稿後にリセット
+        setPostContent(""); // 投稿後に入力内容をリセット
       } else {
         console.error("投稿に失敗しました。");
+        const errorData = await response.json();
+        alert(`エラー: ${errorData.message}`);
       }
     } catch (error) {
       console.error("エラーが発生しました:", error);
+      alert("エラーが発生しました。再試行してください。");
     }
   };
 
@@ -81,5 +87,3 @@ const PostForm = () => {
 };
 
 export default PostForm;
-
-export {};

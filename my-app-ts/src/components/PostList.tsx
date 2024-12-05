@@ -1,10 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+// `Post` 型をGoのモデルに基づいて定義
+type Post = {
+  id: string;           // Postの一意のID
+  user_id: string;      // 投稿者のID
+  community_id: string; // 投稿が属するコミュニティID
+  content: string;      // 投稿の内容
+  created_at: string;   // 作成日時
+  reply_to_id?: string; // 返信先のPost ID（オプション）
+};
 
 const PostList = () => {
-  const posts = [
-    { id: 1, title: "投稿1", body: "これはテスト投稿です。" },
-    { id: 2, title: "投稿2", body: "新しい投稿がここに表示されます。" },
-  ];
+  const [posts, setPosts] = useState<Post[]>([]); // 型をPost[]に設定
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch("/api/posts"); // APIエンドポイント
+        if (!response.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+        const data: Post[] = await response.json(); // APIレスポンスを型付け
+        setPosts(data); // 取得したデータをセット
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+
+    fetchPosts(); // データ取得
+  }, []);
 
   return (
     <div>
@@ -20,8 +44,21 @@ const PostList = () => {
             boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
           }}
         >
-          <h3>{post.title}</h3>
-          <p>{post.body}</p>
+          <p style={{ fontSize: "14px", color: "#666" }}>
+            投稿者ID: {post.user_id}
+          </p>
+          <p style={{ fontSize: "14px", color: "#666" }}>
+            コミュニティID: {post.community_id}
+          </p>
+          <p style={{ fontSize: "16px", fontWeight: "bold" }}>{post.content}</p>
+          <p style={{ fontSize: "12px", color: "#999" }}>
+            投稿日時: {new Date(post.created_at).toLocaleString()}
+          </p>
+          {post.reply_to_id && (
+            <p style={{ fontSize: "12px", color: "#999" }}>
+              返信元の投稿ID: {post.reply_to_id}
+            </p>
+          )}
           <button
             style={{
               padding: "5px 10px",
@@ -41,5 +78,3 @@ const PostList = () => {
 };
 
 export default PostList;
-
-export {};
