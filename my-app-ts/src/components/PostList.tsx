@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { fetchPosts } from "../service/postService";
 
 // `Post` 型をGoのモデルに基づいて定義
 type Post = {
@@ -14,20 +15,16 @@ const PostList = () => {
   const [posts, setPosts] = useState<Post[]>([]); // 型をPost[]に設定
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const loadPosts = async () => {
       try {
-        const response = await fetch("/api/posts"); // APIエンドポイント
-        if (!response.ok) {
-          throw new Error("Failed to fetch posts");
-        }
-        const data: Post[] = await response.json(); // APIレスポンスを型付け
-        setPosts(data); // 取得したデータをセット
+        const postsData = await fetchPosts();
+        setPosts(postsData);
       } catch (error) {
-        console.error("Error fetching posts:", error);
+        console.error("Failed to load posts:", error);
       }
     };
 
-    fetchPosts(); // データ取得
+    loadPosts(); // データ取得
   }, []);
 
   return (
@@ -47,9 +44,9 @@ const PostList = () => {
           <p style={{ fontSize: "14px", color: "#666" }}>
             投稿者ID: {post.user_id}
           </p>
-          <p style={{ fontSize: "14px", color: "#666" }}>
+          {/* <p style={{ fontSize: "14px", color: "#666" }}>
             コミュニティID: {post.community_id}
-          </p>
+          </p> */}
           <p style={{ fontSize: "16px", fontWeight: "bold" }}>{post.content}</p>
           <p style={{ fontSize: "12px", color: "#999" }}>
             投稿日時: {new Date(post.created_at).toLocaleString()}
