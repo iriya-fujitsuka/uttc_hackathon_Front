@@ -25,7 +25,7 @@ const PostForm = () => {
 
     try {
       // fetch を使用してバックエンドにPOSTリクエストを送信
-      const response = await fetch("/api/posts", {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/posts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,9 +37,9 @@ const PostForm = () => {
         console.log("投稿が成功しました！");
         setPostContent(""); // 投稿後に入力内容をリセット
       } else {
-        console.error("投稿に失敗しました。");
-        const errorData = await response.json();
-        alert(`エラー: ${errorData.message}`);
+        const errorText = await response.text();
+        console.error("投稿に失敗しました。", errorText);
+        alert(`エラー: ${errorText}`);
       }
     } catch (error) {
       console.error("エラーが発生しました:", error);
