@@ -12,7 +12,9 @@ type Post = {
 };
 
 const PostList = () => {
-  const [posts, setPosts] = useState<Post[]>([]); // 型をPost[]に設定
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [replyContent, setReplyContent] = useState<string>("");
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -26,6 +28,47 @@ const PostList = () => {
 
     loadPosts(); // データ取得
   }, []);
+
+  const handleReply = (postId: string) => {
+    setReplyingTo(postId);
+  };
+
+  const submitReply = async (postId: string) => {
+    if (!replyContent.trim()) {
+      alert("返信内容を入力してください！");
+      return;
+    }
+
+    const reply = {
+      user_id: "currentUserId", // 現在のユーザーIDを取得する必要があります
+      content: replyContent,
+      reply_to_id: postId, // 元の投稿のIDを設定
+    };
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/replies`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reply),
+      });
+
+      if (response.ok) {
+        console.log("返信が成功しました！");
+        setReplyContent(""); // 返信後に入力内容をリセット
+        setReplyingTo(null); // 返信モードを解除
+        // ここで投稿を再取得して更新することを検討
+      } else {
+        const errorText = await response.text();
+        console.error("返信に失敗しました。", errorText);
+        alert(`エラー: ${errorText}`);
+      }
+    } catch (error) {
+      console.error("エラーが発生しました:", error);
+      alert("エラーが発生しました。再試行してください。");
+    }
+  };
 
   return (
     <div>
@@ -51,11 +94,6 @@ const PostList = () => {
           <p style={{ fontSize: "12px", color: "#999" }}>
             投稿日時: {new Date(post.created_at).toLocaleString()}
           </p>
-          {post.reply_to_id && (
-            <p style={{ fontSize: "12px", color: "#999" }}>
-              返信元の投稿ID: {post.reply_to_id}
-            </p>
-          )}
           <button
             style={{
               padding: "5px 10px",
@@ -64,10 +102,58 @@ const PostList = () => {
               border: "none",
               borderRadius: "5px",
               cursor: "pointer",
+              marginRight: "5px",
             }}
+            onClick={() => handleReply(post.id)}
           >
-            いいね
+            返信
           </button>
+          {replyingTo === post.id && (
+            <div style={{ marginTop: "10px" }}>
+              <textarea
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                placeholder="返信を入力..."
+                style={{ width: "100%", height: "50px" }}
+              />
+              <button
+                style={{
+                  padding: "5px 10px",
+                  backgroundColor: "blue",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  marginTop: "5px",
+                }}
+                onClick={() => submitReply(post.id)}
+              >
+                返信を送信
+              </button>
+            </div>
+          )}
+          {posts
+            .filter((reply) => reply.reply_to_id === post.id)
+            .map((reply) => (
+              <div
+                key={reply.id}
+                style={{
+                  marginLeft: "20px",
+                  padding: "5px",
+                  backgroundColor: "#f9f9f9",
+                  borderRadius: "5px",
+                  marginTop: "5px",
+                }}
+              >
+                <p style={{ fontSize: "14px", color: "#666" }}>
+                  返信者ID: {reply.user_id}
+                </p>
+                <p style={{ fontSize: "14px" }}>{reply.content}</p>
+                <p style={{ fontSize: "12px", color: "#999" }}>
+                  返信日時: {new Date(reply.created_at).toLocaleString()}
+                </p>
+              </div>
+            ))}
         </div>
       ))}
     </div>
