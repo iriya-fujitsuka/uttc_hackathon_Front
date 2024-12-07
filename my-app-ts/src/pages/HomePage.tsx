@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom";
 import CommunityList from "../components/CommunityList";
 import PostForm from "../components/PostForm";
 import PostList from "../components/PostList";
+import { useUser } from "../context/UserContext";
 
 const HomePage = () => {
+  const { userId, userName } = useUser();
   const [user, setUser] = useState<any>(null); // ログイン中のユーザー情報を管理
   const navigate = useNavigate();
 
@@ -15,6 +17,9 @@ const HomePage = () => {
     const unsubscribe = onAuthStateChanged(fireAuth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser); // 認証済み
+        
+        // ユーザーIDをローカルストレージに保存
+        localStorage.setItem("userId", currentUser.uid);
       } else {
         navigate("/login"); // 未認証ならログインページへリダイレクト
       }
@@ -24,9 +29,16 @@ const HomePage = () => {
     return () => unsubscribe();
   }, [navigate]);
 
+  useEffect(() => {
+    if (userId) {
+      console.log("User ID from context:", userId);
+    }
+  }, [userId, navigate]);
+
   const handleLogout = async () => {
     try {
       await signOut(fireAuth); // Firebaseの認証状態を解除
+      localStorage.removeItem("userId"); // ログアウト時に削除
       navigate("/login"); // ログインページへリダイレクト
     } catch (error) {
       console.error("Error logging out:", error);
@@ -45,7 +57,7 @@ const HomePage = () => {
           alignItems: "center",
         }}
       >
-        <h1>ようこそ、{user?.email} さん！</h1>
+        <h1>ようこそ、{userName} さん！</h1>
         <button
           onClick={handleLogout}
           style={{

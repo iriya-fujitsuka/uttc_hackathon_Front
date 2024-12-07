@@ -17,21 +17,37 @@ const PostList = () => {
   const [replyContent, setReplyContent] = useState<string>("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [likeCounts, setLikeCounts] = useState<{ [key: string]: number }>({});
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    const loadUserId = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+        setUserId(userId); // usersテーブルのIDを設定
+      } catch (error) {
+        console.error("Failed to load user ID:", error);
+      }
+    };
+
     const loadPosts = async () => {
       try {
         const postsData = await fetchPosts();
         setPosts(postsData);
 
-        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/like-counts`);
-        const counts = await response.json();
-        setLikeCounts(counts);
+        // likeCountsDataの型を明示的に指定
+        const likeCountsData: { [key: string]: number } = {};
+        for (const post of postsData) {
+          const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/like-counts?postID=${post.id}`);
+          const countData = await response.json();
+          likeCountsData[post.id] = countData.likeCount;
+        }
+        setLikeCounts(likeCountsData);
       } catch (error) {
         console.error("Failed to load posts or like counts:", error);
       }
     };
 
+    loadUserId();
     loadPosts();
   }, []);
 
@@ -114,7 +130,7 @@ const PostList = () => {
           >
             返信
           </button>
-          <LikeButton postId={post.id} initialCount={likeCounts[post.id] || 0} />
+          <LikeButton postId={post.id} initialCount={likeCounts[post.id] || 0} userId={userId} />
           {replyingTo === post.id && (
             <div style={{ marginTop: "10px" }}>
               <textarea

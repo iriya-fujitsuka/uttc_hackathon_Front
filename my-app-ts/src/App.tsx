@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import RegisterPage from "./pages/RegisterPage"; 
 import { useEffect, useState } from "react";
+import { UserProvider } from "./context/UserContext";
 
 // 認証状態に基づくルート保護用コンポーネント
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -31,6 +32,7 @@ const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
 // メインアプリ
 function App() {
   return (
+    <UserProvider>
     <Router>
       <Routes>
         {/* デフォルトページを /login にリダイレクト */}
@@ -49,6 +51,7 @@ function App() {
         />
       </Routes>
     </Router>
+    </UserProvider>
   );
 }
 

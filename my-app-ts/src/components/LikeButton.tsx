@@ -3,26 +3,30 @@ import React, { useState } from "react";
 type LikeButtonProps = {
   postId: string;
   initialCount: number;
+  userId: string | null;
 };
 
-const LikeButton: React.FC<LikeButtonProps> = ({ postId, initialCount }) => {
+const LikeButton: React.FC<LikeButtonProps> = ({ postId, initialCount, userId }) => {
   const [likeCount, setLikeCount] = useState(initialCount);
 
   const toggleLike = async () => {
+    console.log("toggleLikeのあと", userId, postId);
     try {
       const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/toggle-like`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user_id: "currentUserId", post_id: postId }),
+        body: JSON.stringify({ user_id: userId, post_id: postId }),
+  
       });
 
       if (response.ok) {
         console.log("いいねがトグルされました！");
-        const countsResponse = await fetch(`${process.env.REACT_APP_BASE_URL}/api/like-counts`);
+        const countsResponse = await fetch(`${process.env.REACT_APP_BASE_URL}/api/like-counts?postID=${postId}`);
         const counts = await countsResponse.json();
-        setLikeCount(counts[postId] || 0);
+        console.log("counts", counts);
+        setLikeCount(counts.like_count || 0);
       } else {
         const errorText = await response.text();
         console.error("いいねのトグルに失敗しました。", errorText);

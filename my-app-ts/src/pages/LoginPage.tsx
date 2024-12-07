@@ -3,12 +3,14 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { fireAuth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import "../styles/LoginPage.css";
+import { useUser} from "../context/UserContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { setUserId, setUserName } = useUser();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,8 +19,20 @@ const LoginPage = () => {
       const user = userCredential.user;
       console.log("User logged in:", user);
 
-      // ログイン成功後、ユーザー情報を保存してホームページへリダイレクト
-      localStorage.setItem("userId", user.uid); // 必要ならUIDを保存
+      // ローザー情報を取得するAPIを呼び出す
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/users?email=${user.email}`);
+      if (!response.ok) {
+        throw new Error("ユーザー情報の取得に失敗しました。");
+      }
+      const userData = await response.json();
+      console.log("userData", userData.id);
+      // コンテキストに�ーザーIDを保存
+      setUserId(userData.id);
+      setUserName(userData.name);
+
+      // ローカルストレージにユーザーIDを保存
+      localStorage.setItem("userId", userData.id);
+
       navigate("/home"); // リダイレクト
     } catch (err: any) {
       console.error("Error during login:", err.message);
