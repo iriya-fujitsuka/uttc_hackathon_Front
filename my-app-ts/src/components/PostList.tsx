@@ -64,7 +64,7 @@ const PostList = () => {
 
   const submitReply = async (postId: string) => {
     if (!replyContent.trim()) {
-      alert("返信内容を入力してください！");
+      alert("返信内容を���力してください！");
       return;
     }
 
@@ -102,7 +102,9 @@ const PostList = () => {
   return (
     <div>
       <h2>最近の投稿</h2>
-      {posts.map((post) => (
+      {posts
+      .filter((post) => !post.reply_to_id) // 通常の投稿のみを表示
+      .map((post) => (
         <div
           key={post.id}
           style={{
