@@ -36,6 +36,7 @@ const PostForm = () => {
       if (response.ok) {
         console.log("投稿が成功しました！");
         setPostContent(""); // 投稿後に入力内容をリセット
+        window.location.reload(); // ページをリロード
       } else {
         const errorText = await response.text();
         console.error("投稿に失敗しました。", errorText);

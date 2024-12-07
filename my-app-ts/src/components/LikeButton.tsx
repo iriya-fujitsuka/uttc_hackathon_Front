@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 type LikeButtonProps = {
   postId: string;
@@ -8,6 +8,10 @@ type LikeButtonProps = {
 
 const LikeButton: React.FC<LikeButtonProps> = ({ postId, initialCount, userId }) => {
   const [likeCount, setLikeCount] = useState(initialCount);
+ 
+  useEffect(() => {
+    setLikeCount(initialCount);
+  }, [initialCount]);
 
   const toggleLike = async () => {
     console.log("toggleLikeのあと", userId, postId);
@@ -18,7 +22,6 @@ const LikeButton: React.FC<LikeButtonProps> = ({ postId, initialCount, userId })
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ user_id: userId, post_id: postId }),
-  
       });
 
       if (response.ok) {

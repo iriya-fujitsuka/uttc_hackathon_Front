@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchPosts } from "../service/postService";
 import LikeButton from "./LikeButton";
+import { useUser } from "../context/UserContext";
 
 // `Post` 型をGoのモデルに基づいて定義
 type Post = {
@@ -17,18 +18,9 @@ const PostList = () => {
   const [replyContent, setReplyContent] = useState<string>("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [likeCounts, setLikeCounts] = useState<{ [key: string]: number }>({});
-  const [userId, setUserId] = useState<string | null>(null);
-
+  const { userId } = useUser();
   useEffect(() => {
-    const loadUserId = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
-        setUserId(userId); // usersテーブルのIDを設定
-      } catch (error) {
-        console.error("Failed to load user ID:", error);
-      }
-    };
-
+   
     const loadPosts = async () => {
       try {
         const postsData = await fetchPosts();
@@ -37,17 +29,32 @@ const PostList = () => {
         // likeCountsDataの型を明示的に指定
         const likeCountsData: { [key: string]: number } = {};
         for (const post of postsData) {
-          const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/like-counts?postID=${post.id}`);
-          const countData = await response.json();
-          likeCountsData[post.id] = countData.likeCount;
+          try {
+            const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/like-counts?postID=${post.id}`);
+            if (!response.ok) {
+              throw new Error(`Failed to fetch like count for post ID: ${post.id}`);
+            }
+            const countData = await response.json();
+            console.log(`Response for post ID ${post.id}:`, countData);
+
+            if (countData && typeof countData.like_count === 'number') {
+              likeCountsData[post.id] = countData.like_count;
+            } else {
+              console.warn(`Invalid likeCount for post ID: ${post.id}`, countData);
+              likeCountsData[post.id] = 0;
+            }
+          } catch (error) {
+            console.error(`Error fetching like count for post ID: ${post.id}`, error);
+            likeCountsData[post.id] = 0;
+          }
         }
+        console.log("likeCountsData", likeCountsData);
         setLikeCounts(likeCountsData);
       } catch (error) {
         console.error("Failed to load posts or like counts:", error);
       }
     };
 
-    loadUserId();
     loadPosts();
   }, []);
 
@@ -62,7 +69,7 @@ const PostList = () => {
     }
 
     const reply = {
-      user_id: "currentUserId", // 現在のユーザーIDを取得する必要があります
+      user_id: userId, // 現在のユーザーIDを取得する必要があります
       content: replyContent,
       reply_to_id: postId, // 元の投稿のIDを設定
     };
@@ -80,7 +87,7 @@ const PostList = () => {
         console.log("返信が成功しました！");
         setReplyContent(""); // 返信後に入力内容をリセット
         setReplyingTo(null); // 返信モードを解除
-        // ここで投稿を再取得して更新することを検討
+        window.location.reload(); // ページをリ�ード
       } else {
         const errorText = await response.text();
         console.error("返信に失敗しました。", errorText);

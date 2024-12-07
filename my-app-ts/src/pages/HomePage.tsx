@@ -11,15 +11,23 @@ const HomePage = () => {
   const { userId, userName } = useUser();
   const [user, setUser] = useState<any>(null); // ログイン中のユーザー情報を管理
   const navigate = useNavigate();
+  const { setUserId, setUserName } = useUser();
 
   useEffect(() => {
     // 認証状態を監視
-    const unsubscribe = onAuthStateChanged(fireAuth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(fireAuth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser); // 認証済み
-        
-        // ユーザーIDをローカルストレージに保存
-        localStorage.setItem("userId", currentUser.uid);
+
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/users?email=${currentUser.email}`);
+        if (!response.ok) {
+          throw new Error("ユーザー情報の取得に失敗しました。");
+        }
+        const userData = await response.json();
+        console.log("userData", userData.id);
+        // コンテキストに�ーザーIDを保存
+        setUserId(userData.id);
+        setUserName(userData.name);
       } else {
         navigate("/login"); // 未認証ならログインページへリダイレクト
       }
@@ -27,7 +35,7 @@ const HomePage = () => {
 
     // クリーンアップ
     return () => unsubscribe();
-  }, [navigate]);
+  }, [navigate, user]);
 
   useEffect(() => {
     if (userId) {
