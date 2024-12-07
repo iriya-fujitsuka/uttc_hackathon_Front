@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchPosts } from "../service/postService";
+import LikeButton from "./LikeButton";
 
 // `Post` 型をGoのモデルに基づいて定義
 type Post = {
@@ -15,18 +16,23 @@ const PostList = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [replyContent, setReplyContent] = useState<string>("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [likeCounts, setLikeCounts] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     const loadPosts = async () => {
       try {
         const postsData = await fetchPosts();
         setPosts(postsData);
+
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/like-counts`);
+        const counts = await response.json();
+        setLikeCounts(counts);
       } catch (error) {
-        console.error("Failed to load posts:", error);
+        console.error("Failed to load posts or like counts:", error);
       }
     };
 
-    loadPosts(); // データ取得
+    loadPosts();
   }, []);
 
   const handleReply = (postId: string) => {
@@ -108,6 +114,7 @@ const PostList = () => {
           >
             返信
           </button>
+          <LikeButton postId={post.id} initialCount={likeCounts[post.id] || 0} />
           {replyingTo === post.id && (
             <div style={{ marginTop: "10px" }}>
               <textarea
