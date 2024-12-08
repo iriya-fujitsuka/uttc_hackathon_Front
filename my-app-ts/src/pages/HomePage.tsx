@@ -51,18 +51,21 @@ const HomePage = () => {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <div style={{ padding: "10px 20px", backgroundColor: "#f7f7f7", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>ようこそ、{userName} さん！</h1>
-        <button onClick={handleLogout} style={{ backgroundColor: "black", color: "white", padding: "10px 20px", border: "none", borderRadius: "5px", cursor: "pointer" }}>ログアウト</button>
+    <div className="container" style={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "#f0f8ff", color: "#333" }}>
+      <div style={{ padding: "20px", backgroundColor: "#ffebcd", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img src="/images/logo light.jpg" alt="Logo" style={{ height: "60px", marginRight: "15px" }} />
+          <h1 style={{ margin: 0, fontSize: "24px", color: "#000" }}>ようこそ、{userName} さん！</h1>
+        </div>
+        <button onClick={handleLogout} style={{ padding: "10px 20px", backgroundColor: "#ff69b4", color: "white", border: "none", borderRadius: "20px", cursor: "pointer", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", transition: "transform 0.2s" }}>ログアウト</button>
       </div>
 
-      <div style={{ display: "flex", flex: 1 }}>
-        <div style={{ flex: 1, backgroundColor: "#f7f7f7", padding: "20px" }}>
+      <div style={{ display: "flex", flex: 1, padding: "20px", gap: "20px" }}>
+        <div style={{ flex: 1, backgroundColor: "#fffaf0", padding: "20px", borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
           <CommunityList onSelect={setSelectedCommunityId} />
         </div>
 
-        <div style={{ flex: 3, padding: "20px" }}>
+        <div style={{ flex: 3, padding: "20px", backgroundColor: "#fffaf0", borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
           <PostForm />
           <PostList selectedCommunityId={selectedCommunityId} />
         </div>

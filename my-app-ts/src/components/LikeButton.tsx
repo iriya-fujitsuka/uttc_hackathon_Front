@@ -46,16 +46,20 @@ const LikeButton: React.FC<LikeButtonProps> = ({ postId, initialCount, userId })
       <button
         style={{
           padding: "5px 10px",
-          backgroundColor: "red",
+          backgroundColor: "#ff69b4",
           color: "white",
           border: "none",
-          borderRadius: "5px",
+          borderRadius: "20px",
           cursor: "pointer",
           marginRight: "5px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          transition: "transform 0.2s",
         }}
         onClick={toggleLike}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
       >
-        いいね
+        ❤️ いいね
       </button>
       <span>{likeCount} いいね</span>
     </div>
