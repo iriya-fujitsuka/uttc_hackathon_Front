@@ -8,9 +8,10 @@ type Community = {
 
 type CommunityListProps = {
   onSelect: (communityId: number | null) => void;
+  onCommunitiesLoaded: (communities: { id: number; name: string }[]) => void;
 };
 
-const CommunityList: React.FC<CommunityListProps> = ({ onSelect }) => {
+const CommunityList: React.FC<CommunityListProps> = ({ onSelect, onCommunitiesLoaded }) => {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [newCommunityName, setNewCommunityName] = useState("");
 
@@ -25,10 +26,12 @@ const CommunityList: React.FC<CommunityListProps> = ({ onSelect }) => {
         throw new Error("Failed to fetch communities");
       }
       const data = await response.json();
-      setCommunities(data.map((community: any) => ({
+      const communityList = data.map((community: any) => ({
         id: Number(community.id),
         name: community.name,
-      })));
+      }));
+      setCommunities(communityList);
+      onCommunitiesLoaded(communityList);
     } catch (error) {
       console.error("Error fetching communities:", error);
     }

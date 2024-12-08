@@ -11,8 +11,10 @@ const HomePage = () => {
   const { userId, userName } = useUser();
   const [user, setUser] = useState<any>(null);
   const [selectedCommunityId, setSelectedCommunityId] = useState<number | null>(null);
+  const [communities, setCommunities] = useState<{ id: number; name: string }[]>([]);
   const navigate = useNavigate();
   const { setUserId, setUserName } = useUser();
+  const [communityName, setCommunityName] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(fireAuth, async (currentUser) => {
@@ -50,6 +52,16 @@ const HomePage = () => {
     }
   };
 
+  const handleCommunitySelect = (communityId: number | null) => {
+    setSelectedCommunityId(communityId);
+    if (communityId === null) {
+      setCommunityName(null);
+    } else {
+      const selectedCommunity = communities.find((c) => c.id === communityId);
+      setCommunityName(selectedCommunity ? selectedCommunity.name : null);
+    }
+  };
+
   return (
     <div className="container" style={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "#f0f8ff", color: "#333" }}>
       <div style={{ padding: "20px", backgroundColor: "#ffebcd", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
@@ -62,12 +74,12 @@ const HomePage = () => {
 
       <div style={{ display: "flex", flex: 1, padding: "20px", gap: "20px" }}>
         <div style={{ flex: 1, backgroundColor: "#fffaf0", padding: "20px", borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
-          <CommunityList onSelect={setSelectedCommunityId} />
+          <CommunityList onSelect={handleCommunitySelect} onCommunitiesLoaded={setCommunities} />
         </div>
 
         <div style={{ flex: 3, padding: "20px", backgroundColor: "#fffaf0", borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
           <PostForm />
-          <PostList selectedCommunityId={selectedCommunityId} />
+          <PostList selectedCommunityId={selectedCommunityId} communityName={communityName} />
         </div>
       </div>
     </div>

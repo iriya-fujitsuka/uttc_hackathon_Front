@@ -15,9 +15,10 @@ type Post = {
 
 type PostListProps = {
   selectedCommunityId: number | null;
+  communityName: string | null;
 };
 
-const PostList: React.FC<PostListProps> = ({ selectedCommunityId }) => {
+const PostList: React.FC<PostListProps> = ({ selectedCommunityId, communityName }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [replyContent, setReplyContent] = useState<string>("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -112,7 +113,7 @@ const PostList: React.FC<PostListProps> = ({ selectedCommunityId }) => {
 
   return (
     <div>
-      <h2>最近の投稿</h2>
+      <h2>{communityName ? communityName : "最近の投稿"}</h2>
       {sortedPosts
         .filter((post) => !post.reply_to_id)
         .map((post) => (
