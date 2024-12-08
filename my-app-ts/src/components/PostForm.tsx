@@ -1,7 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const PostForm = () => {
   const [postContent, setPostContent] = useState("");
+  const [selectedCommunityId, setSelectedCommunityId] = useState<number | null>(null);
+  const [communities, setCommunities] = useState<{ id: number; name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchCommunities = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/communities`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch communities");
+        }
+        const data = await response.json();
+        setCommunities(data.map((community: any) => ({
+          id: Number(community.id),
+          name: community.name,
+        })));
+      } catch (error) {
+        console.error("Error fetching communities:", error);
+      }
+    };
+
+    fetchCommunities();
+  }, []);
 
   const handleSubmit = async () => {
     // 投稿内容が空でないことを確認
@@ -10,18 +32,24 @@ const PostForm = () => {
       return;
     }
 
-    // ローカルストレージからユーザーIDを取得
+    if (selectedCommunityId === null) {
+      alert("コミュニティを選択してください！");
+      return;
+    }
+
     const userId = localStorage.getItem("userId");
     if (!userId) {
       alert("ログインしていません。ログイン後に投稿してください。");
       return;
     }
 
-    // 投稿データを準備
     const post = {
-      user_id: userId, // ログイン中のユーザーID
-      content: postContent, // 投稿内容
+      user_id: userId,
+      content: postContent,
+      community_id: selectedCommunityId,
     };
+
+    console.log("Sending post data:", post);
 
     try {
       // fetch を使用してバックエンドにPOSTリクエストを送信
@@ -36,7 +64,9 @@ const PostForm = () => {
       if (response.ok) {
         console.log("投稿が成功しました！");
         setPostContent(""); // 投稿後に入力内容をリセット
-        window.location.reload(); // ページをリロード
+        setTimeout(() => {
+            window.location.reload(); // 3秒後にページをリロード
+          }, 3000);
       } else {
         const errorText = await response.text();
         console.error("投稿に失敗しました。", errorText);
@@ -58,6 +88,26 @@ const PostForm = () => {
         boxShadow: "0px 2px 5px rgba(0,0,0,0.1)",
       }}
     >
+      <select
+        value={selectedCommunityId !== null ? selectedCommunityId : ""}
+        onChange={(e) => setSelectedCommunityId(Number(e.target.value))}
+        style={{
+          width: "100%",
+          padding: "10px",
+          borderRadius: "5px",
+          border: "1px solid #ccc",
+          marginBottom: "10px",
+        }}
+      >
+        <option value="" disabled>
+          コミュニティを選択してください
+        </option>
+        {communities.map((community) => (
+          <option key={community.id} value={community.id}>
+            {community.name}
+          </option>
+        ))}
+      </select>
       <textarea
         placeholder="今の気持ちは？"
         value={postContent}
