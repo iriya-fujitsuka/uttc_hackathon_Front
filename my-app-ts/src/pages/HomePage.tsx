@@ -11,6 +11,7 @@ const HomePage = () => {
   const { userId, userName } = useUser();
   const [user, setUser] = useState<any>(null);
   const [selectedCommunityId, setSelectedCommunityId] = useState<number | null>(null);
+  const [isCommunityListVisible, setIsCommunityListVisible] = useState<boolean>(false);
   const navigate = useNavigate();
   const { setUserId, setUserName } = useUser();
 
@@ -61,11 +62,14 @@ const HomePage = () => {
       </div>
 
       <div className="content" style={{ display: "flex", flex: 1, padding: "20px", gap: "20px" }}>
-        <div style={{ flex: 1, backgroundColor: "#fffaf0", padding: "20px", borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+        <div style={{ flex: 1, backgroundColor: "#fffaf0", padding: "20px", borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", display: isCommunityListVisible ? 'block' : 'none' }}>
           <CommunityList onSelect={setSelectedCommunityId} />
         </div>
 
         <div style={{ flex: 3, padding: "20px", backgroundColor: "#fffaf0", borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+          <button onClick={() => setIsCommunityListVisible(!isCommunityListVisible)} style={{ marginBottom: "10px", padding: "10px", backgroundColor: "#ff69b4", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>
+            {isCommunityListVisible ? "コミュニティを隠す" : "コミュニティを表示"}
+          </button>
           <PostForm />
           <PostList selectedCommunityId={selectedCommunityId} />
         </div>
