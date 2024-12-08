@@ -64,7 +64,7 @@ const PostList = () => {
 
   const submitReply = async (postId: string) => {
     if (!replyContent.trim()) {
-      alert("返信内容を���力してください！");
+      alert("返信内容を入力してください！");
       return;
     }
 
