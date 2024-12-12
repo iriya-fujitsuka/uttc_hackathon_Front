@@ -51,31 +51,25 @@ const HomePage = () => {
     }
   };
 
-  const toggleCommunityList = () => {
-    setIsCommunityListVisible(!isCommunityListVisible);
-  };
-
   return (
-    <div className="container">
-      <div className="header">
-        <div className="header-left">
-          <img src="/images/logo light.jpg" alt="Logo" className="logo" />
-          <h1 className="welcome-text">ようこそ、{userName} さん！</h1>
+    <div className="container" style={{ display: "flex", flexDirection: "column", height: "100vh", backgroundColor: "#f0f8ff", color: "#333" }}>
+      <div className="header" style={{ padding: "20px", backgroundColor: "#ffebcd", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <img src="/images/logo light.jpg" alt="Logo" style={{ height: "60px", marginRight: "15px" }} />
+          <h1 style={{ margin: 0, fontSize: "24px", color: "#000" }}>ようこそ、{userName} さん！</h1>
         </div>
-        <button className="logout-button" onClick={handleLogout}>
-          ログアウト
-        </button>
-        <button className="toggle-button" onClick={toggleCommunityList}>
-          {isCommunityListVisible ? "コミュニティを隠す" : "コミュニティを表示"}
-        </button>
+        <button onClick={handleLogout} style={{ padding: "10px 20px", backgroundColor: "#ff69b4", color: "white", border: "none", borderRadius: "20px", cursor: "pointer", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", transition: "transform 0.2s" }}>ログアウト</button>
       </div>
 
-      <div className="content">
-        <div className={`community-list ${isCommunityListVisible ? "visible" : ""}`}>
+      <div className="content" style={{ display: "flex", flex: 1, padding: "20px", gap: "20px" }}>
+        <div style={{ flex: 1, backgroundColor: "#fffaf0", padding: "20px", borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", display: isCommunityListVisible ? 'block' : 'none' }}>
           <CommunityList onSelect={setSelectedCommunityId} />
         </div>
 
-        <div className="main-content">
+        <div style={{ flex: 3, padding: "20px", backgroundColor: "#fffaf0", borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}>
+          <button onClick={() => setIsCommunityListVisible(!isCommunityListVisible)} style={{ marginBottom: "10px", padding: "10px", backgroundColor: "#ff69b4", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>
+            {isCommunityListVisible ? "コミュニティを隠す" : "コミュニティを表示"}
+          </button>
           <PostForm />
           <PostList selectedCommunityId={selectedCommunityId} />
         </div>
